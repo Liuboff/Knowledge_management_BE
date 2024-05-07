@@ -1,5 +1,6 @@
 const { Note } = require('../models/note');
 const express = require('express');
+const { User } = require('../models/user');
 const router = express.Router();
 
 router.get(`/`, async (req, res) =>{
@@ -20,8 +21,6 @@ router.get('/:id', async(req,res)=>{
     res.status(200).send(note);
 })
 
-
-
 router.post('/', async (req,res)=>{
     let note = new Note({
         title: req.body.title,
@@ -32,7 +31,6 @@ router.post('/', async (req,res)=>{
         author: req.body.author,
         projects: req.body.projects
     })
-    console.log(note);//////////////////////////////////////////////////////////
     note = await note.save();
 
     if(!note)
@@ -42,7 +40,7 @@ router.post('/', async (req,res)=>{
 })
 
 
-router.put('/:id',async (req, res)=> {
+router.put('/:id', async (req, res)=> {
     const note = await Note.findByIdAndUpdate(
         req.params.id,
         {
@@ -73,5 +71,32 @@ router.delete('/:id', (req, res)=>{
        return res.status(500).json({success: false, error: err}) 
     })
 })
+
+router.get('/usernotes/:userId', async(req,res)=>{
+    const notes = await Note.find({ author: req.params.userId });
+    if(!notes) {
+        res.status(500).json({message: 'The notes in user with the given ID were not found.'})
+    }
+    res.status(200).send(notes);
+})
+
+// router.get('/usernotes/:userId', async(req,res)=>{
+//     const user = await User.findById(req.params.userId).select('notes');
+
+//     console.log(user);
+
+//     if(!user) {
+//         res.status(500).json({message: 'The user with the given ID was not found.'})
+//     }
+
+//     const notes = await Note.find({ _id: { $in: user.notes } });
+
+//     console.log(notes);
+
+//     if(!notes) {
+//         res.status(500).json({message: 'The notes in user with the given ID were not found.'})
+//     }
+//     res.status(200).send(notes);
+// })
 
 module.exports = router;

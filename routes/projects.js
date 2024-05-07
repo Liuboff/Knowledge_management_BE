@@ -23,16 +23,16 @@ router.get('/:id', async(req,res)=>{
 })
 
 
-router.post('/userProjectsByIds', async(req,res)=>{    
-    try {
-        const ids = req.body;
-        const objects = await Project.find({ _id: { $in: ids } });
-        res.status(200).send(objects);
-    } catch (error) {
-        console.error('Error: ', error);
-        res.status(500).json({ message: 'The projects with the given IDs were not found.' });
-    }
-})
+// router.post('/userProjectsByIds', async(req,res)=>{    
+//     try {
+//         const ids = req.body;
+//         const objects = await Project.find({ _id: { $in: ids } });
+//         res.status(200).send(objects);
+//     } catch (error) {
+//         console.error('Error: ', error);
+//         res.status(500).json({ message: 'The projects with the given IDs were not found.' });
+//     }
+// })
 
 router.post('/', async (req,res)=>{
     let project = new Project({
