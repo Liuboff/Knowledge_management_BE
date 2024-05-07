@@ -132,12 +132,12 @@ router.delete('/:id', (req, res)=>{
 })
 
 router.get('/projects/:id', async(req,res)=>{
-    const projects = await User.findById(req.params.id).select('projects');
+    const user = await User.findById(req.params.id).select('projects');
 
-    if(!projects) {
+    if(!user) {
         res.status(500).json({message: 'The user with the given ID was not found.'})
-    } 
-    res.status(200).send(projects);
+    }
+    res.status(200).send(user.projects);
 })
 
 router.get(`/get/count`, async (req, res) =>{

@@ -1,6 +1,8 @@
 const { Project } = require('../models/project');
+const { User } = require('../models/user');
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 
 router.get(`/`, async (req, res) =>{
     const projectList = await Project.find();
@@ -21,6 +23,16 @@ router.get('/:id', async(req,res)=>{
 })
 
 
+router.post('/userProjectsByIds', async(req,res)=>{    
+    try {
+        const ids = req.body;
+        const objects = await Project.find({ _id: { $in: ids } });
+        res.status(200).send(objects);
+    } catch (error) {
+        console.error('Error: ', error);
+        res.status(500).json({ message: 'The projects with the given IDs were not found.' });
+    }
+})
 
 router.post('/', async (req,res)=>{
     let project = new Project({
@@ -30,7 +42,6 @@ router.post('/', async (req,res)=>{
         team: req.body.tags,
         tasks: req.body.category
     })
-    console.log(project);//////////////////////////////////////////////////////////
     project = await project.save();
 
     if(!project)

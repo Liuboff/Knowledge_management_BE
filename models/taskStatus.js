@@ -7,7 +7,6 @@ const taskStatusSchema = mongoose.Schema({
     }
 })
 
-
 taskStatusSchema.virtual('id').get(function () {
     return this._id.toHexString();
 });

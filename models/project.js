@@ -20,4 +20,4 @@ projectSchema.set('toJSON', {
     virtuals: true
 });
 
-exports.Category = mongoose.model('Project', projectSchema);
+exports.Project = mongoose.model('Project', projectSchema);
