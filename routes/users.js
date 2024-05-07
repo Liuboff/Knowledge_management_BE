@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { Project } = require('../models/project');
 
 router.get(`/`, async (req, res) =>{
     const userList = await User.find().select('-passwordHash');
@@ -133,11 +134,15 @@ router.delete('/:id', (req, res)=>{
 
 router.get('/projects/:id', async(req,res)=>{
     const user = await User.findById(req.params.id).select('projects');
+    const projects = await Project.find({ _id: { $in: user.projects } });
 
     if(!user) {
         res.status(500).json({message: 'The user with the given ID was not found.'})
     }
-    res.status(200).send(user.projects);
+    if(!projects) {
+        res.status(500).json({message: 'The projects in user with the given ID were not found.'})
+    }
+    res.status(200).send(projects);
 })
 
 router.get(`/get/count`, async (req, res) =>{
