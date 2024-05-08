@@ -1,6 +1,7 @@
 const { Note } = require('../models/note');
 const express = require('express');
 const { User } = require('../models/user');
+const { Comment } = require('../models/comment');
 const router = express.Router();
 
 router.get(`/`, async (req, res) =>{
@@ -78,6 +79,32 @@ router.get('/usernotes/:userId', async(req,res)=>{
         res.status(500).json({message: 'The notes in user with the given ID were not found.'})
     }
     res.status(200).send(notes);
+})
+
+router.get('/comments/:noteId', async(req,res)=>{
+    const comments = await Comment.find({ noteId: req.params.noteId });
+    if(!comments) {
+        res.status(500).json({message: 'The comments in note with the given ID were not found.'})
+    }
+
+    
+    res.status(200).send(comments);
+})
+
+router.post('/commentCreate', async (req,res)=>{
+    let comment = new Comment({
+        title: req.body.title,
+        content: req.body.content,
+        image: req.body.image,
+        noteId: req.body.noteId,
+        authorId: req.body.authorId
+    })
+    comment = await comment.save();
+
+    if(!comment)
+    return res.status(400).send('the comment cannot be created!')
+
+    res.send(comment);
 })
 
 // router.get('/usernotes/:userId', async(req,res)=>{
