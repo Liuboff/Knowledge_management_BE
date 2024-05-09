@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 
 const commentSchema = mongoose.Schema({
-    title: { type: String, required: true },
     content: { type: String },
     image: { type: String },
     noteId: { type: mongoose.Schema.Types.ObjectId, ref: 'Note' },

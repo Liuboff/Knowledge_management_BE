@@ -73,7 +73,7 @@ router.delete('/:id', (req, res)=>{
     })
 })
 
-router.get('/usernotes/:userId', async(req,res)=>{
+router.get('/notesByUser/:userId', async(req,res)=>{
     const notes = await Note.find({ author: req.params.userId });
     if(!notes) {
         res.status(500).json({message: 'The notes in user with the given ID were not found.'})
@@ -93,7 +93,6 @@ router.get('/comments/:noteId', async(req,res)=>{
 
 router.post('/commentCreate', async (req,res)=>{
     let comment = new Comment({
-        title: req.body.title,
         content: req.body.content,
         image: req.body.image,
         noteId: req.body.noteId,
@@ -105,6 +104,18 @@ router.post('/commentCreate', async (req,res)=>{
     return res.status(400).send('the comment cannot be created!')
 
     res.send(comment);
+})
+
+router.delete('/comments/:commentId', (req, res)=>{
+    Comment.findByIdAndRemove(req.params.commentId).then(comment =>{
+        if(comment) {
+            return res.status(200).json({success: true, message: 'the comment is deleted!'})
+        } else {
+            return res.status(404).json({success: false , message: "comment not found!"})
+        }
+    }).catch(err=>{
+       return res.status(500).json({success: false, error: err}) 
+    })
 })
 
 // router.get('/usernotes/:userId', async(req,res)=>{
