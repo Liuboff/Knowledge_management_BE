@@ -10,7 +10,7 @@ router.get(`/`, async (req, res) =>{
         res.status(500).json({success: false})
     } 
     res.status(200).send(noteList);
-})
+});
 
 router.get('/:id', async(req,res)=>{
     const note = await Note.findById(req.params.id);
@@ -19,7 +19,7 @@ router.get('/:id', async(req,res)=>{
         res.status(500).json({message: 'The note with the given ID was not found.'})
     } 
     res.status(200).send(note);
-})
+});
 
 router.post('/', async (req,res)=>{
     let note = new Note({
@@ -37,7 +37,7 @@ router.post('/', async (req,res)=>{
     return res.status(400).send('the note cannot be created!')
 
     res.send(note);
-})
+});
 
 
 router.put('/:id', async (req, res)=> {
@@ -55,22 +55,27 @@ router.put('/:id', async (req, res)=> {
     )
 
     if(!note)
-    return res.status(400).send('the note cannot be created!')
+    return res.status(400).send('The note cannot be created!')
 
     res.send(note);
-})
+});
 
-router.delete('/:id', (req, res)=>{
-    Note.findByIdAndRemove(req.params.id).then(note =>{
-        if(note) {
-            return res.status(200).json({success: true, message: 'the note is deleted!'})
+router.delete('/:noteId', async (req, res)=>{
+    try {
+        console.log(req.params.notetId);
+        const note = await Note.findByIdAndDelete(req.params.noteId);
+        console.log(note);
+        if (note) {
+            await Comment.deleteMany({ noteId: req.params.noteId });
+            console.log('after comments del');
+            return res.status(200).json({ success: true, message: 'The note and its comments are deleted!' });
         } else {
-            return res.status(404).json({success: false , message: "note not found!"})
+            return res.status(404).json({ success: false, message: 'Note not found!' });
         }
-    }).catch(err=>{
-       return res.status(500).json({success: false, error: err}) 
-    })
-})
+    } catch (err) {
+        return res.status(500).json({ success: false, error: err });
+    }
+});
 
 router.get('/notesByUser/:userId', async(req,res)=>{
     const notes = await Note.find({ author: req.params.userId });
@@ -78,7 +83,7 @@ router.get('/notesByUser/:userId', async(req,res)=>{
         res.status(500).json({message: 'The notes in user with the given ID were not found.'})
     }
     res.status(200).send(notes);
-})
+});
 
 router.get('/comments/:noteId', async(req,res)=>{
     const comments = await Comment.find({ noteId: req.params.noteId });
@@ -86,7 +91,7 @@ router.get('/comments/:noteId', async(req,res)=>{
         res.status(500).json({message: 'The comments in note with the given ID were not found.'})
     }
     res.status(200).send(comments);
-})
+});
 
 router.post('/commentCreate', async (req,res)=>{
     let comment = new Comment({
@@ -101,7 +106,7 @@ router.post('/commentCreate', async (req,res)=>{
     return res.status(400).send('the comment cannot be created!')
 
     res.send(comment);
-})
+});
 
 router.delete('/comments/:commentId', (req, res)=>{
     Comment.findByIdAndDelete(req.params.commentId).then(comment =>{
@@ -113,6 +118,6 @@ router.delete('/comments/:commentId', (req, res)=>{
     }).catch(err=>{
        return res.status(500).json({success: false, error: err}) 
     })
-})
+});
 
 module.exports = router;
