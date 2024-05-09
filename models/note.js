@@ -11,7 +11,7 @@ const noteSchema = mongoose.Schema({
 	}],
     dateCreated: { type: Date, default: Date.now },
     dateUpdated: { type: Date, default: Date.now },
-    author: { 
+    authorId: { 
 		type: mongoose.Schema.Types.ObjectId, 
 		ref: 'User' 
 	},

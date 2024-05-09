@@ -28,7 +28,7 @@ router.post('/', async (req,res)=>{
         image: req.body.image,
         tags: req.body.tags,
         category: req.body.category,
-        author: req.body.author,
+        authorId: req.body.authorId,
         projects: req.body.projects
     })
     note = await note.save();
@@ -49,7 +49,7 @@ router.put('/:id', async (req, res)=> {
             image: req.body.image || note.image,
             tags: req.body.tags,
             category: req.body.category,
-            author: req.body.author
+            authorId: req.body.authorId
         },
         { new: true }
     )
@@ -62,12 +62,9 @@ router.put('/:id', async (req, res)=> {
 
 router.delete('/:noteId', async (req, res)=>{
     try {
-        console.log(req.params.notetId);
         const note = await Note.findByIdAndDelete(req.params.noteId);
-        console.log(note);
         if (note) {
             await Comment.deleteMany({ noteId: req.params.noteId });
-            console.log('after comments del');
             return res.status(200).json({ success: true, message: 'The note and its comments are deleted!' });
         } else {
             return res.status(404).json({ success: false, message: 'Note not found!' });
