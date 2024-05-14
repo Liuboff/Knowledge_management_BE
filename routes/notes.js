@@ -29,7 +29,7 @@ router.post('/', async (req,res)=>{
         tags: req.body.tags,
         category: req.body.category,
         authorId: req.body.authorId,
-        projects: req.body.projects
+        project: req.body.project
     })
     note = await note.save();
 
@@ -75,9 +75,17 @@ router.delete('/:noteId', async (req, res)=>{
 });
 
 router.get('/notesByUser/:userId', async(req,res)=>{
-    const notes = await Note.find({ author: req.params.userId });
+    const notes = await Note.find({ authorId: req.params.userId });
     if(!notes) {
         res.status(500).json({message: 'The notes in user with the given ID were not found.'})
+    }
+    res.status(200).send(notes);
+});
+
+router.get('/notesByProject/:projectId', async(req,res)=>{
+    const notes = await Note.find({ project: req.params.projectId });
+    if(!notes) {
+        res.status(500).json({message: 'The notes in project with the given ID were not found.'})
     }
     res.status(200).send(notes);
 });

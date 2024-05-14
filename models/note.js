@@ -5,10 +5,14 @@ const noteSchema = mongoose.Schema({
     content: { type: String },
     image: { type: String },
     tags: { type: String },
-    categories: [{ 
+    category: { 
 		type: mongoose.Schema.Types.ObjectId, 
 		ref: 'Category' 
-	}],
+	},
+    project: { 
+		type: mongoose.Schema.Types.ObjectId, 
+		ref: 'Project' 
+	},
     dateCreated: { type: Date, default: Date.now },
     dateUpdated: { type: Date, default: Date.now },
     authorId: { 
