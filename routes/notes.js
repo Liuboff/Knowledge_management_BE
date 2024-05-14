@@ -34,7 +34,7 @@ router.post('/', async (req,res)=>{
     note = await note.save();
 
     if(!note)
-    return res.status(400).send('the note cannot be created!')
+    return res.status(400).send('the note can not be created!')
 
     res.send(note);
 });
@@ -55,7 +55,7 @@ router.put('/:id', async (req, res)=> {
     )
 
     if(!note)
-    return res.status(400).send('The note cannot be created!')
+    return res.status(400).send('The note can not be created!')
 
     res.send(note);
 });
@@ -100,7 +100,7 @@ router.post('/commentCreate', async (req,res)=>{
     comment = await comment.save();
 
     if(!comment)
-    return res.status(400).send('the comment cannot be created!')
+    return res.status(400).send('the comment can not be created!')
 
     res.send(comment);
 });

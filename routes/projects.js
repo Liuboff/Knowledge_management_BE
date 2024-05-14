@@ -23,16 +23,35 @@ router.get('/:id', async(req,res)=>{
 })
 
 
-// router.post('/userProjectsByIds', async(req,res)=>{    
-//     try {
-//         const ids = req.body;
-//         const objects = await Project.find({ _id: { $in: ids } });
-//         res.status(200).send(objects);
-//     } catch (error) {
-//         console.error('Error: ', error);
-//         res.status(500).json({ message: 'The projects with the given IDs were not found.' });
-//     }
-// })
+router.get('/userProjectsByUserId/:userId', async (req, res) => {
+    try {
+        const user = await User.findById(req.params.userId).select('projects');
+        if (!user) return res.status(404).json({ message: 'User not found.' });
+        
+        const userProjectsIds = user.projects;
+        const projects = await Project.find({ _id: { $in: userProjectsIds } });
+        
+        if (!projects.length) {
+            return res.status(404).json({ message: 'The user with the given ID doesn\'t have active projects.' });
+        }
+        res.status(200).send(projects);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'An error occurred while retrieving projects.' });
+    }
+});
+
+
+router.post('/userProjectsByIds', async(req,res)=>{    
+    try {
+        const ids = req.body;
+        const objects = await Project.find({ _id: { $in: ids } });
+        res.status(200).send(objects);
+    } catch (error) {
+        console.error('Error: ', error);
+        res.status(500).json({ message: 'The projects with the given IDs were not found.' });
+    }
+})
 
 router.post('/', async (req,res)=>{
     let project = new Project({
