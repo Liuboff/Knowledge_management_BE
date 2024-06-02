@@ -1,7 +1,33 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
 const { Note } = require('../models/note');
 const { Comment } = require('../models/comment');
+
+const FILE_TYPE_MAP = {
+    'image/png': 'png',
+    'image/jpeg': 'jpeg',
+    'image/jpg': 'jpg'
+};
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        const isValid = FILE_TYPE_MAP[file.mimetype];
+        let uploadError = new Error('invalid image type');
+
+        if (isValid) {
+            uploadError = null;
+        }
+        cb(uploadError, 'public/uploads');
+    },
+    filename: function (req, file, cb) {
+        const fileName = file.originalname.split(' ').join('-');
+        const extension = FILE_TYPE_MAP[file.mimetype];
+        cb(null, `${fileName}-${Date.now()}.${extension}`);
+    }
+});
+
+const uploadOptions = multer({ storage: storage });
 
 router.get(`/`, async (req, res) =>{
     const noteList = await Note.find();
@@ -21,22 +47,30 @@ router.get('/:id', async(req,res)=>{
     res.status(200).send(note);
 });
 
-router.post('/', async (req,res)=>{
-    let note = new Note({
+router.post('/', uploadOptions.single('image'), async (req, res) => {
+    const file = req.file;
+    if (!file) return res.status(400).send('No image in the request');
+
+    const fileName = file.filename;
+    const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
+
+    try {
+      let note = new Note({
         title: req.body.title,
         content: req.body.content,
-        image: req.body.image,
-        tags: req.body.tags,
+        image: `${basePath}${fileName}`,
         category: req.body.category,
         authorId: req.body.authorId,
         project: req.body.project
-    })
-    note = await note.save();
-
-    if(!note)
-    return res.status(400).send('the note can not be created!')
-
-    res.send(note);
+      });
+      note = await note.save();
+      if (!note) {
+        return res.status(400).send('The note cannot be created!');
+      }
+      res.status(201).send(note);
+    } catch (error) {
+      res.status(500).json({ message: 'An error occurred while creating the note.', error: error.message });
+    }
 });
 
 

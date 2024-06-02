@@ -1,5 +1,6 @@
 const { Project } = require('../models/project');
 const { User } = require('../models/user');
+const { Task } = require('../models/task');
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
@@ -45,9 +46,82 @@ router.get('/userProjectsByUserId/:userId', async (req, res) => {
         if (!projects.length) {
             return res.status(404).json({ message: 'The user with the given ID doesn\'t have active projects.' });
         }
+        
         res.status(200).send(projects);
     } catch {
         res.status(500).json({ message: 'An error occurred while retrieving projects.' });
+    }
+});
+
+router.get('/teamByprojectId/:projectId', async (req, res) => {
+    if (!mongoose.Types.ObjectId.isValid(req.params.projectId)) {
+        return res.status(400).json({ success: false, message: 'Invalid project ID' });
+    }
+    try {
+        const projectTeam = await Project.findById(req.params.projectId).select('team');
+        if (!projectTeam) return res.status(404).json({ message: 'Project not found.' });
+
+        const projectTeamIds = projectTeam.team;
+        const team = await User.find({ _id: { $in: projectTeamIds } });
+
+        if (!team.length) {
+            return res.status(404).json({ message: 'The project with the given ID doesn\'t have active members.' });
+        }
+        res.status(200).send(team);
+    } catch {
+        res.status(500).json({ message: 'An error occurred while retrieving team.' });
+    }
+});
+
+// router.get('/tasksByprojectId/:projectId', async (req, res) => {
+//     if (!mongoose.Types.ObjectId.isValid(req.params.projectId)) {
+//         return res.status(400).json({ success: false, message: 'Invalid project ID' });
+//     }
+//     try {
+//         const projectTasks = await Project.findById(req.params.projectId).select('tasks');
+//         if (!projectTasks) return res.status(404).json({ message: 'Project not found.' });
+
+//         const projectTasksIds = projectTasks.tasks;
+//         const tasks = await Task.find({ _id: { $in: projectTasksIds } });
+
+//         if (!tasks.length) {
+//             return res.status(404).json({ message: 'The project with the given ID doesn\'t have tasks.' });
+//         }
+//         res.status(200).send(tasks);
+//     } catch {
+//         res.status(500).json({ message: 'An error occurred while retrieving tasks.' });
+//     }
+// });
+
+router.get('/tasksByProjectId/:projectId', async (req, res) => {
+    if (!mongoose.Types.ObjectId.isValid(req.params.projectId)) {
+        return res.status(400).json({ success: false, message: 'Invalid project ID' });
+    }
+    try {
+        const tasks = await Task.find({ projectId: { $in: req.params.projectId } });
+
+        if (!tasks.length) {
+            return res.status(404).json({ message: 'The project with the given ID doesn\'t have tasks.' });
+        }
+        res.status(200).send(tasks);
+    } catch {
+        res.status(500).json({ message: 'An error occurred while retrieving tasks.' });
+    }
+});
+
+router.get('/taskById/:taskId', async (req, res) => {
+    if (!mongoose.Types.ObjectId.isValid(req.params.taskId)) {
+        return res.status(400).json({ success: false, message: 'Invalid task ID' });
+    }
+    try {
+        const task = await Task.findById(req.params.taskId);
+
+        if (!task) {
+            return res.status(404).json({ message: 'The task with the given ID doesn\'t exist.' });
+        }
+        res.status(200).send(task);
+    } catch {
+        res.status(500).json({ message: 'An error occurred while retrieving task.' });
     }
 });
 

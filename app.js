@@ -21,10 +21,9 @@ app.use(errorHandler);
 //Routes
 const categoriesRoutes = require("./routes/categories");
 const projectsRoutes = require("./routes/projects");
+const tasksRoutes = require("./routes/tasks");
 const notesRoutes = require("./routes/notes");
 const usersRoutes = require("./routes/users");
-// const productsRoutes = require("./routes/products");
-// const ordersRoutes = require("./routes/orders");
 
 const api = process.env.API_URL;
 
@@ -32,8 +31,7 @@ app.use(`${api}/users`, usersRoutes);
 app.use(`${api}/categories`, categoriesRoutes);
 app.use(`${api}/notes`, notesRoutes);
 app.use(`${api}/projects`, projectsRoutes);
-// app.use(`${api}/products`, productsRoutes);
-// app.use(`${api}/orders`, ordersRoutes);
+app.use(`${api}/tasks`, tasksRoutes);
 
 //Database
 mongoose
